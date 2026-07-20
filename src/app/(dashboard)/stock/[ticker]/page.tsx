@@ -3,7 +3,7 @@ import PriceChart from "@/components/PriceChart";
 import { getCompanyNews, getProfile, getQuote } from "@/lib/finnhub";
 import { getDailyCandles } from "@/lib/alphavantage";
 import { createClient } from "@/lib/supabase/server";
-import { addHolding } from "../../portfolio/actions";
+import { addHolding } from "@/app/portfolio/actions";
 
 function isoDate(date: Date) {
   return date.toISOString().slice(0, 10);

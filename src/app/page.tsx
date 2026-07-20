@@ -11,8 +11,8 @@ export default function Home() {
 
       <SearchBar />
 
-      <Link href="/portfolio" className="text-sm underline">
-        Go to your portfolio
+      <Link href="/dashboard" className="text-sm underline">
+        Go to your dashboard
       </Link>
     </div>
   );

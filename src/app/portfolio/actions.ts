@@ -20,7 +20,7 @@ export async function addHolding(formData: FormData) {
     ticker: ticker.toUpperCase(),
   });
 
-  revalidatePath("/portfolio");
+  revalidatePath("/dashboard");
 }
 
 export async function removeHolding(formData: FormData) {
@@ -29,5 +29,25 @@ export async function removeHolding(formData: FormData) {
 
   await supabase.from("portfolios").delete().eq("id", id);
 
-  revalidatePath("/portfolio");
+  revalidatePath("/dashboard");
+}
+
+export async function updateHolding(formData: FormData) {
+  const id = formData.get("id") as string;
+  const shares = Number(formData.get("shares"));
+  const costBasis = formData.get("costBasis")
+    ? Number(formData.get("costBasis"))
+    : null;
+
+  if (!shares || shares <= 0) {
+    throw new Error("Shares must be a positive number");
+  }
+
+  const supabase = await createClient();
+  await supabase
+    .from("portfolios")
+    .update({ shares, cost_basis: costBasis })
+    .eq("id", id);
+
+  revalidatePath("/dashboard");
 }

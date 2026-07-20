@@ -29,3 +29,11 @@ export function searchSymbols(query: string) {
 export function getCompanyNews(symbol: string, from: string, to: string) {
   return finnhubFetch("/company-news", { symbol, from, to });
 }
+
+export function getMarketNews() {
+  return finnhubFetch("/news", { category: "general" });
+}
+
+export function getEarningsCalendar(from: string, to: string) {
+  return finnhubFetch("/calendar/earnings", { from, to });
+}

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import IndexCard from "@/components/IndexCard";
+import NewsList from "@/components/NewsList";
 import SearchBar from "@/components/SearchBar";
 import SectorRow from "@/components/SectorRow";
-import { getQuote } from "@/lib/finnhub";
+import { getMarketNews, getQuote } from "@/lib/finnhub";
 import { INDICES } from "@/lib/indices";
+import { buildMarketSummary } from "@/lib/marketSummary";
 import { SECTORS } from "@/lib/sectors";
 
 type Quote = { c?: number; d?: number; dp?: number };
@@ -17,10 +19,15 @@ async function safeQuote(symbol: string): Promise<Quote | null> {
 }
 
 export default async function Home() {
-  const [indexQuotes, sectorQuotes] = await Promise.all([
+  const [indexQuotes, sectorQuotes, news] = await Promise.all([
     Promise.all(INDICES.map((i) => safeQuote(i.symbol))),
     Promise.all(SECTORS.map((s) => safeQuote(s.symbol))),
+    getMarketNews().catch(() => []),
   ]);
+
+  const summary = buildMarketSummary(
+    INDICES.map((idx, i) => ({ name: idx.name, quote: indexQuotes[i] }))
+  );
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-16">
@@ -45,13 +52,25 @@ export default async function Home() {
       </section>
 
       <section className="rounded-2xl border bg-white p-4">
-        <h2 className="mb-2 text-lg font-semibold">Sector Performance</h2>
-        <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
-          {SECTORS.map((s, i) => (
-            <SectorRow key={s.symbol} name={s.name} quote={sectorQuotes[i]} />
-          ))}
-        </div>
+        <h2 className="mb-2 text-lg font-semibold">Market Summary</h2>
+        <p className="text-sm text-gray-700">{summary}</p>
       </section>
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <section className="rounded-2xl border bg-white p-4">
+          <h2 className="mb-2 text-lg font-semibold">Sector Performance</h2>
+          <div className="flex flex-col">
+            {SECTORS.map((s, i) => (
+              <SectorRow key={s.symbol} name={s.name} quote={sectorQuotes[i]} />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-2xl border bg-white p-4">
+          <h2 className="mb-2 text-lg font-semibold">Market News</h2>
+          <NewsList items={news} />
+        </section>
+      </div>
     </div>
   );
 }

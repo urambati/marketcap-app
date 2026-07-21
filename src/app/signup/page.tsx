@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signup } from "../login/actions";
+import MarketingHeader from "@/components/MarketingHeader";
 
 export default async function SignupPage({
   searchParams,
@@ -9,8 +10,13 @@ export default async function SignupPage({
   const { error } = await searchParams;
 
   return (
-    <div className="mx-auto mt-24 max-w-sm">
-      <h1 className="mb-6 text-2xl font-semibold">Sign up</h1>
+    <>
+      <MarketingHeader />
+      <main className="auth-shell">
+      <section className="premium-card w-full max-w-md p-8">
+      <span className="eyebrow">Free to start</span>
+      <h1 className="mb-2 mt-5 text-3xl font-semibold tracking-tight">Create your Northstar</h1>
+      <p className="muted mb-6 text-sm">Build a focused watchlist and learn how your portfolio moves.</p>
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
@@ -27,12 +33,13 @@ export default async function SignupPage({
           type="password"
           placeholder="Password"
           required
-          minLength={6}
+          minLength={8}
+          autoComplete="new-password"
           className="rounded border px-3 py-2"
         />
         <button
           type="submit"
-          className="rounded bg-black px-3 py-2 text-white"
+          className="button button-primary"
         >
           Sign up
         </button>
@@ -44,6 +51,8 @@ export default async function SignupPage({
           Log in
         </Link>
       </p>
-    </div>
+      </section>
+      </main>
+    </>
   );
 }

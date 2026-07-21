@@ -19,11 +19,7 @@ export default function SearchBar() {
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    if (query.trim().length < 1) {
-      setResults([]);
-      setError(false);
-      return;
-    }
+    if (query.trim().length < 1) return;
 
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
@@ -50,7 +46,15 @@ export default function SearchBar() {
     <div className="relative w-full max-w-md">
       <input
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          const value = e.target.value;
+          setQuery(value);
+          if (!value.trim()) {
+            setResults([]);
+            setError(false);
+            setLoading(false);
+          }
+        }}
         placeholder="Search stocks (e.g. AAPL, Tesla)"
         className="w-full rounded border px-4 py-2 text-black"
       />

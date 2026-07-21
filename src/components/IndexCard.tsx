@@ -9,7 +9,7 @@ export default function IndexCard({
 }) {
   if (!quote || quote.c == null) {
     return (
-      <div className="rounded-2xl border bg-white p-4">
+      <div className="premium-card p-4">
         <div className="text-sm font-medium">{name}</div>
         <div className="mt-2 text-xs text-gray-400">Unavailable</div>
       </div>
@@ -21,7 +21,7 @@ export default function IndexCard({
   const isUp = change >= 0;
 
   return (
-    <div className="rounded-2xl border bg-white p-4">
+    <div className="premium-card p-4 hover:-translate-y-0.5">
       <div className="text-sm font-medium">{name}</div>
       <div className="mt-1 text-lg font-semibold">{quote.c.toFixed(2)}</div>
       <div className={`mt-1 text-sm ${isUp ? "text-green-600" : "text-red-600"}`}>

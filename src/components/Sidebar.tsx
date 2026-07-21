@@ -5,8 +5,8 @@ import { logout } from "@/app/login/actions";
 export default function Sidebar({ signedIn }: { signedIn: boolean }) {
   return (
     <aside className="flex w-full shrink-0 flex-col gap-6 border-b bg-white px-4 py-6 sm:w-56 sm:border-b-0 sm:border-r">
-      <Link href="/" className="text-lg font-semibold">
-        MarketCap
+      <Link href="/" className="brand-mark text-lg font-semibold">
+        <span className="brand-symbol">N</span><span>Northstar</span>
       </Link>
 
       <SearchBar />
@@ -20,6 +20,9 @@ export default function Sidebar({ signedIn }: { signedIn: boolean }) {
         </Link>
         <Link href="/" className="rounded px-3 py-2 hover:bg-gray-100">
           Markets
+        </Link>
+        <Link href="/pricing" className="rounded px-3 py-2 hover:bg-gray-100">
+          Pricing
         </Link>
       </nav>
 

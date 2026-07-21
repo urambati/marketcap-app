@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export async function addHolding(formData: FormData) {
@@ -15,10 +16,17 @@ export async function addHolding(formData: FormData) {
     throw new Error("Must be logged in to add to portfolio");
   }
 
-  await supabase.from("portfolios").insert({
+  const [{ data: subscription }, { count }] = await Promise.all([
+    supabase.from("subscriptions").select("status").eq("user_id", user.id).maybeSingle(),
+    supabase.from("portfolios").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+  ]);
+  const isPro = subscription && ["active", "trialing"].includes(subscription.status);
+  if (!isPro && (count ?? 0) >= 10) redirect("/pricing?limit=watchlist");
+
+  await supabase.from("portfolios").upsert({
     user_id: user.id,
     ticker: ticker.toUpperCase(),
-  });
+  }, { onConflict: "user_id,ticker", ignoreDuplicates: true });
 
   revalidatePath("/dashboard");
 }

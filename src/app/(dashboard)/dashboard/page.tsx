@@ -12,10 +12,11 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: rows } = await supabase
-    .from("portfolios")
-    .select("*")
-    .order("added_at", { ascending: false });
+  const [{ data: rows }, { data: subscription }] = await Promise.all([
+    supabase.from("portfolios").select("*").order("added_at", { ascending: false }),
+    supabase.from("subscriptions").select("status").eq("user_id", user!.id).maybeSingle(),
+  ]);
+  const isPro = subscription && ["active", "trialing"].includes(subscription.status);
 
   const enriched = await Promise.all(
     (rows ?? []).map(async (row) => {
@@ -94,12 +95,12 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <section className="rounded-2xl bg-white p-4 shadow-sm">
           <h2 className="mb-3 text-lg font-semibold">Portfolio Allocation</h2>
-          <PortfolioAllocationChart data={allocationData} />
+          {isPro ? <PortfolioAllocationChart data={allocationData} /> : <ProGate />}
         </section>
 
         <section className="rounded-2xl bg-white p-4 shadow-sm">
           <h2 className="mb-3 text-lg font-semibold">Sector Breakdown</h2>
-          <SectorBreakdown sectors={sectors} />
+          {isPro ? <SectorBreakdown sectors={sectors} /> : <ProGate />}
         </section>
       </div>
 
@@ -145,6 +146,16 @@ export default async function DashboardPage() {
       </section>
 
       <p className="text-xs text-gray-400">Signed in as {user?.email}</p>
+    </div>
+  );
+}
+
+function ProGate() {
+  return (
+    <div className="flex min-h-52 flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center">
+      <span className="eyebrow">Pro analytics</span>
+      <p className="muted mt-3 max-w-xs text-sm">Unlock portfolio allocation, sector exposure and deeper holdings intelligence.</p>
+      <Link href="/pricing" className="button button-primary mt-4">Explore Pro</Link>
     </div>
   );
 }

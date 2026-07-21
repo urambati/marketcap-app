@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Northstar Portfolio
 
-## Getting Started
+Northstar Portfolio is a personal investment dashboard built as an educational,
+non-commercial demo. It combines market quotes, company news, earnings, stock
+charts, watchlists, portfolio analytics, Supabase authentication, and Stripe
+sandbox subscriptions.
 
-First, run the development server:
+> Market data may be delayed. Nothing in this project is investment advice.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+- Next.js 16, React 19, TypeScript and Tailwind CSS 4
+- Supabase Auth and Postgres with row-level security
+- Finnhub for quotes, search, profiles and news
+- Alpha Vantage for daily candles
+- Stripe Checkout, Billing Portal and signed webhooks
+
+## Local development
+
+Copy `.env.local.example` to `.env.local`, add the required sandbox keys, run
+the SQL in `supabase/schema.sql`, and then:
+
+```powershell
+npm.cmd install
+npm.cmd run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+For the complete Stripe sandbox listener setup:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+.\setup-stripe-local.cmd
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See `STRIPE_SETUP.md` for details.
 
-## Learn More
+## Verification
 
-To learn more about Next.js, take a look at the following resources:
+```powershell
+npm.cmd run lint
+npm.cmd run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Vercel deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Import the GitHub repository into Vercel and add every key from
+`.env.local.example` under Project Settings → Environment Variables. Never
+upload `.env.local`.
 
-## Deploy on Vercel
+After the first deployment:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Set `NEXT_PUBLIC_SITE_URL` to the final `https://*.vercel.app` URL.
+2. Set the same URL as Supabase Authentication's Site URL and add it to Redirect URLs.
+3. Create a Stripe sandbox webhook at `https://YOUR-URL/api/stripe/webhook`.
+4. Subscribe it to `checkout.session.completed`,
+   `customer.subscription.updated`, and `customer.subscription.deleted`.
+5. Add that endpoint's `whsec_...` value to Vercel as
+   `STRIPE_WEBHOOK_SECRET`, then redeploy.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Use separate Stripe live-mode credentials only if this project later becomes a
+real commercial product.

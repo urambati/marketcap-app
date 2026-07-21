@@ -32,7 +32,7 @@ export default function PortfolioAllocationChart({
               <Cell key={entry.name} fill={COLORS[i % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+          <Tooltip formatter={(value) => `$${Number(value ?? 0).toFixed(2)}`} />
         </PieChart>
       </ResponsiveContainer>
     </div>

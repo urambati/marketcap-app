@@ -17,8 +17,11 @@ export default async function StockPage({
   const { ticker } = await params;
   const symbol = ticker.toUpperCase();
 
-  const to = isoDate(new Date());
-  const from = isoDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+  const today = new Date();
+  const weekAgo = new Date(today);
+  weekAgo.setDate(today.getDate() - 7);
+  const to = isoDate(today);
+  const from = isoDate(weekAgo);
 
   const supabase = await createClient();
   const {

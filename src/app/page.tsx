@@ -1,6 +1,8 @@
 import Link from "next/link";
 import EarningsCalendar from "@/components/EarningsCalendar";
 import IndexCard from "@/components/IndexCard";
+import MarketingHeader from "@/components/MarketingHeader";
+import SiteFooter from "@/components/SiteFooter";
 import NewsList from "@/components/NewsList";
 import SearchBar from "@/components/SearchBar";
 import SectorRow from "@/components/SectorRow";
@@ -48,20 +50,24 @@ export default async function Home() {
     .slice(0, 10);
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-16">
-      <div className="flex flex-col items-center gap-6 text-center">
-        <h1 className="text-3xl font-semibold">MarketCap</h1>
-        <p className="text-gray-600">
-          Search for a stock to see live pricing, charts, and news.
-        </p>
-        <SearchBar />
-        <Link href="/dashboard" className="text-sm underline">
-          Go to your dashboard
-        </Link>
-      </div>
+    <>
+      <MarketingHeader />
+      <main>
+        <section className="hero-shell">
+          <span className="eyebrow">Live market intelligence</span>
+          <h1 className="hero-title">Build conviction.<br /><span>Invest with clarity.</span></h1>
+          <p className="hero-copy">Follow the market, organize your watchlist, and understand your portfolio from one beautifully focused workspace.</p>
+          <div className="mx-auto mt-8 max-w-xl"><SearchBar /></div>
+          <div className="hero-actions">
+            <Link href="/dashboard" className="button button-primary">Open your portfolio</Link>
+            <Link href="/pricing" className="button button-ghost">View pricing</Link>
+          </div>
+        </section>
 
-      <section>
-        <h2 className="mb-3 text-lg font-semibold">US Markets</h2>
+      <div className="content-shell flex flex-col gap-10">
+
+      <section id="markets">
+        <div className="section-heading"><div><p>Market pulse</p><h2>US markets</h2></div><p>ETF proxy data · delayed</p></div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {INDICES.map((idx, i) => (
             <IndexCard key={idx.symbol} name={idx.name} quote={indexQuotes[i]} />
@@ -69,13 +75,15 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="rounded-2xl border bg-white p-4">
-        <h2 className="mb-2 text-lg font-semibold">Market Summary</h2>
-        <p className="text-sm text-gray-700">{summary}</p>
+      <section className="premium-card relative overflow-hidden p-6">
+        <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-violet-500 to-cyan-500" />
+        <p className="mb-2 text-xs font-bold uppercase tracking-widest text-violet-500">Today at a glance</p>
+        <h2 className="mb-2 text-xl font-semibold">Market summary</h2>
+        <p className="muted max-w-3xl text-sm leading-6">{summary}</p>
       </section>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <section className="rounded-2xl border bg-white p-4">
+        <section className="premium-card p-5">
           <h2 className="mb-2 text-lg font-semibold">Sector Performance</h2>
           <div className="flex flex-col">
             {SECTORS.map((s, i) => (
@@ -84,16 +92,19 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="rounded-2xl border bg-white p-4">
+        <section className="premium-card p-5">
           <h2 className="mb-2 text-lg font-semibold">Market News</h2>
           <NewsList items={news} />
         </section>
       </div>
 
-      <section className="rounded-2xl border bg-white p-4">
+      <section className="premium-card p-5">
         <h2 className="mb-2 text-lg font-semibold">Upcoming Earnings</h2>
         <EarningsCalendar items={upcomingEarnings} />
       </section>
-    </div>
+      </div>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

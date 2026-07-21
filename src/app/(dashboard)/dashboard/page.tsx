@@ -19,11 +19,16 @@ export default async function DashboardPage() {
 
   const enriched = await Promise.all(
     (rows ?? []).map(async (row) => {
-      const [quote, profile] = await Promise.all([
+      const [quoteResult, profileResult] = await Promise.allSettled([
         getQuote(row.ticker),
         getProfile(row.ticker),
       ]);
-      return { ...row, quote, profile };
+      return {
+        ...row,
+        quote: quoteResult.status === "fulfilled" ? quoteResult.value : {},
+        profile:
+          profileResult.status === "fulfilled" ? profileResult.value : {},
+      };
     })
   );
 

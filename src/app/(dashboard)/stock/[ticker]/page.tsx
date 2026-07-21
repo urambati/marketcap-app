@@ -25,12 +25,38 @@ export default async function StockPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [quote, profile, candlesData, news] = await Promise.all([
-    getQuote(symbol),
-    getProfile(symbol),
-    getDailyCandles(symbol),
-    getCompanyNews(symbol, from, to),
-  ]);
+  const [quoteResult, profileResult, candlesResult, newsResult] =
+    await Promise.allSettled([
+      getQuote(symbol),
+      getProfile(symbol),
+      getDailyCandles(symbol),
+      getCompanyNews(symbol, from, to),
+    ]);
+
+  const quote = quoteResult.status === "fulfilled" ? quoteResult.value : {};
+  const profile = profileResult.status === "fulfilled" ? profileResult.value : {};
+  const candlesData =
+    candlesResult.status === "fulfilled"
+      ? candlesResult.value
+      : { candles: [] };
+  const news = newsResult.status === "fulfilled" ? newsResult.value : [];
+
+  const notFound = !quote.c && !profile.name;
+
+  if (notFound) {
+    return (
+      <div className="mx-auto max-w-3xl px-6 py-16">
+        <Link href="/" className="text-sm underline">
+          ← Back to search
+        </Link>
+        <h1 className="mt-4 text-2xl font-semibold">Stock not found</h1>
+        <p className="mt-2 text-sm text-gray-600">
+          We couldn&apos;t find data for &quot;{symbol}&quot;. Double-check
+          the ticker and try again.
+        </p>
+      </div>
+    );
+  }
 
   const change = quote.d ?? 0;
   const changePct = quote.dp ?? 0;

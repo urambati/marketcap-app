@@ -4,7 +4,7 @@ import { logout } from "@/app/login/actions";
 
 export default function Sidebar({ signedIn }: { signedIn: boolean }) {
   return (
-    <aside className="flex w-56 shrink-0 flex-col gap-6 border-r bg-white px-4 py-6">
+    <aside className="flex w-full shrink-0 flex-col gap-6 border-b bg-white px-4 py-6 sm:w-56 sm:border-b-0 sm:border-r">
       <Link href="/" className="text-lg font-semibold">
         MarketCap
       </Link>

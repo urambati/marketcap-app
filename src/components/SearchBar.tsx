@@ -13,6 +13,7 @@ export default function SearchBar() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -20,15 +21,21 @@ export default function SearchBar() {
 
     if (query.trim().length < 1) {
       setResults([]);
+      setError(false);
       return;
     }
 
     debounceRef.current = setTimeout(async () => {
       setLoading(true);
+      setError(false);
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error("Search request failed");
         const data = await res.json();
         setResults(data.result ?? []);
+      } catch {
+        setResults([]);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -50,6 +57,12 @@ export default function SearchBar() {
 
       {loading && (
         <p className="mt-1 text-sm text-gray-500">Searching…</p>
+      )}
+
+      {error && !loading && (
+        <p className="mt-1 text-sm text-red-600">
+          Search is temporarily unavailable. Try again in a moment.
+        </p>
       )}
 
       {results.length > 0 && (

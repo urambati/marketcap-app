@@ -1,12 +1,17 @@
 import Link from "next/link";
+import EarningsCalendar from "@/components/EarningsCalendar";
 import IndexCard from "@/components/IndexCard";
 import NewsList from "@/components/NewsList";
 import SearchBar from "@/components/SearchBar";
 import SectorRow from "@/components/SectorRow";
-import { getMarketNews, getQuote } from "@/lib/finnhub";
+import { getEarningsCalendar, getMarketNews, getQuote } from "@/lib/finnhub";
 import { INDICES } from "@/lib/indices";
 import { buildMarketSummary } from "@/lib/marketSummary";
 import { SECTORS } from "@/lib/sectors";
+
+function isoDate(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
 
 type Quote = { c?: number; d?: number; dp?: number };
 
@@ -19,15 +24,28 @@ async function safeQuote(symbol: string): Promise<Quote | null> {
 }
 
 export default async function Home() {
-  const [indexQuotes, sectorQuotes, news] = await Promise.all([
+  const today = new Date();
+  const weekOut = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const [indexQuotes, sectorQuotes, news, earnings] = await Promise.all([
     Promise.all(INDICES.map((i) => safeQuote(i.symbol))),
     Promise.all(SECTORS.map((s) => safeQuote(s.symbol))),
     getMarketNews().catch(() => []),
+    getEarningsCalendar(isoDate(today), isoDate(weekOut)).catch(() => ({
+      earningsCalendar: [],
+    })),
   ]);
 
   const summary = buildMarketSummary(
     INDICES.map((idx, i) => ({ name: idx.name, quote: indexQuotes[i] }))
   );
+
+  const upcomingEarnings = (earnings.earningsCalendar ?? [])
+    .filter((e: { epsEstimate?: number | null }) => e.epsEstimate != null)
+    .sort((a: { date: string }, b: { date: string }) =>
+      a.date.localeCompare(b.date)
+    )
+    .slice(0, 10);
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-16">
@@ -71,6 +89,11 @@ export default async function Home() {
           <NewsList items={news} />
         </section>
       </div>
+
+      <section className="rounded-2xl border bg-white p-4">
+        <h2 className="mb-2 text-lg font-semibold">Upcoming Earnings</h2>
+        <EarningsCalendar items={upcomingEarnings} />
+      </section>
     </div>
   );
 }
